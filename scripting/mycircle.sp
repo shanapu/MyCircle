@@ -86,7 +86,7 @@ public Plugin myinfo =  {
 	name = "MyCircle", 
 	author = "shanapu", 
 	description = "Telport players to a circle around admin/warden/ct", 
-	version = "1.0", 
+	version = "1.0.1", 
 	url = "https://github.com/shanapu/MyCircle/"
 };
 
@@ -424,8 +424,6 @@ void Build_Circle(int client, float angle, float radius)
 
 	if (gc_bShowCircle.BoolValue && g_iBeamSprite != -1 && g_iHaloSprite != -1)
 	{
-		delete g_hTimerCircle;
-
 		Handle hData = CreateDataPack();
 		WritePackFloat(hData, clientPos[0]);
 		WritePackFloat(hData, clientPos[1]);
@@ -531,7 +529,7 @@ public void warden_OnWardenRemoved(int client)
 
 void Destroy_Circle()
 {
-	if (!g_bCircle)
+	if (!g_bCircle || g_iCountCircle == 0)
 		return;
 	
 	for (int i = 1; i <= MaxClients; i++)
