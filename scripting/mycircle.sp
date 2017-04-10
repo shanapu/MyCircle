@@ -62,6 +62,7 @@ ConVar gc_sSoundUnFreezePath;
 ConVar gc_sCustomCommandCircle;
 ConVar gc_sCustomCommandRelease;
 ConVar gc_iStuckMode;
+ConVar gc_bHoverCircle;
 
 bool gp_bWarden;
 bool gp_bHosties;
@@ -86,7 +87,7 @@ public Plugin myinfo =  {
 	name = "MyCircle", 
 	author = "shanapu", 
 	description = "Telport players to a circle around admin/warden/ct", 
-	version = "1.0.1", 
+	version = "1.1.1", 
 	url = "https://github.com/shanapu/MyCircle/"
 };
 
@@ -109,6 +110,7 @@ public void OnPluginStart()
 	gc_bRebel = AutoExecConfig_CreateConVar("sm_circle_rebel", "1", "0 - disabled, 1 - ignore rebels (need sm hosties)", _, true, 0.0, true, 1.0);
 	gc_bWeapons = AutoExecConfig_CreateConVar("sm_circle_strip_weapons", "0", "0 - disabled, 1 - Strip the terrors weapons when porting to circle", _, true, 0.0, true, 1.0);
 	gc_bTeam = AutoExecConfig_CreateConVar("sm_circle_team", "1", "0 - Ts & CTs, 1 - Only Terrors porting to circle", _, true, 0.0, true, 1.0);
+	gc_bHoverCircle = AutoExecConfig_CreateConVar("sm_circle_hover", "1", "0 - Players in circle are on ground (may stuck), 1 - Players in circle hover over the ground", _, true, 0.0, true, 1.0);
 	gc_iStuckMode = AutoExecConfig_CreateConVar("sm_circle_stuckmode", "1", "What do when player position in circle is blocked? 0 - do nothing (stuck in prop/wall), 1 - reduce the radius, 2 - try find new postion (experimental)", _, true, 0.0, true, 2.0);
 	gc_iColorCircleRed = AutoExecConfig_CreateConVar("sm_circle_color_circle_red", "100", "What color to turn circle into (set R, G and B values to 255 to disable) (Rgb): x - red value", _, true, 0.0, true, 255.0);
 	gc_iColorCircleGreen = AutoExecConfig_CreateConVar("sm_circle_color_circle_green", "100", "What color to turn circle into (rGb): x - green value", _, true, 0.0, true, 255.0);
@@ -375,7 +377,15 @@ void Build_Circle(int client, float angle, float radius)
 		float newPos[3], vec[3], angles[3];
 		newPos[0] = clientPos[0] + (Cosine(DegToRad(angle) * i / GetArraySize(g_aCircle)) * unitradius);
 		newPos[1] = clientPos[1] + (Sine(DegToRad(angle) * i / GetArraySize(g_aCircle)) * unitradius);
-		newPos[2] = clientPos[2] + 10;
+
+		if (gc_bHoverCircle.BoolValue)
+		{
+			newPos[2] = clientPos[2] + 10;
+		}
+		else
+		{
+			newPos[2] = clientPos[2];
+		}
 
 		SubtractVectors(clientPos, newPos, vec);
 		NormalizeVector(vec, vec);
